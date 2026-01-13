@@ -89,6 +89,10 @@ jobs:
         with:
           repo: rust-embedded/cross
 
+      - name: Setup | Remove lock file for legacy builds
+        if: matrix.toolchain
+        run: rm -f Cargo.lock
+
       - name: Build | Compile
         run: cargo make --profile ${{ matrix.target }} build
 

@@ -44,6 +44,7 @@ tokio = { version = "1", default-features = false, features = [
     "rt",
     "time",
     "sync",
+    "io-std",
 ] }
 tokio-stream = { version = "0", default-features = false }
 futures = "*"
@@ -69,8 +70,10 @@ semtech-udp = { version = ">=0.12", default-features = false, features = [
 time = { version = ">=0.3", features = ["std"] }
 http = "1"
 
-# Both proto stacks use tonic 0.10
-tonic = "0.10"
+# Modern proto stack uses tonic 0.14, legacy uses 0.10
+# Each tonic version is optional and tied to its respective proto feature
+tonic = { version = "0.14", optional = true }
+tonic-legacy = { package = "tonic", version = "0.10", optional = true }
 
 # Modern proto stack (helium-proto master, requires Cargo with workspace inheritance)
 helium-proto = { git = "https://github.com/helium/proto", branch = "master", features = ["services"], optional = true }
@@ -85,12 +88,13 @@ helium-crypto-legacy = { package = "helium-crypto", version = ">=0.8.3", optiona
 
 [features]
 default = ["modern-proto", "ecc608"]
-modern-proto = ["helium-proto", "beacon", "helium-crypto"]
+modern-proto = ["helium-proto", "beacon", "helium-crypto", "tonic"]
 legacy-proto = [
     "signature",
     "helium-proto-legacy",
     "beacon-legacy",
     "helium-crypto-legacy",
+    "tonic-legacy",
 ]
 ecc608 = ["helium-crypto?/ecc608", "helium-crypto-legacy?/ecc608"]
 tpm = ["helium-crypto?/tpm", "helium-crypto-legacy?/tpm"]

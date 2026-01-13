@@ -51,3 +51,38 @@ pub mod services {
     #[cfg(feature = "legacy-proto")]
     pub use helium_proto_legacy::services::*;
 }
+
+// Error type re-exports for use in error.rs
+// These consolidate all conditional error types in one place
+pub mod error {
+    // Crypto errors
+    #[cfg(not(feature = "legacy-proto"))]
+    pub use helium_crypto::Error as CryptoError;
+    #[cfg(feature = "legacy-proto")]
+    pub use helium_crypto_legacy::Error as CryptoError;
+
+    // Beacon errors
+    #[cfg(not(feature = "legacy-proto"))]
+    pub use beacon::Error as BeaconError;
+    #[cfg(feature = "legacy-proto")]
+    pub use beacon_legacy::Error as BeaconError;
+
+    // Prost encode/decode errors (re-exported by helium_proto)
+    #[cfg(not(feature = "legacy-proto"))]
+    pub use helium_proto::{DecodeError as ProstDecodeError, EncodeError as ProstEncodeError};
+    #[cfg(feature = "legacy-proto")]
+    pub use helium_proto_legacy::{
+        DecodeError as ProstDecodeError, EncodeError as ProstEncodeError,
+    };
+
+    // Tonic/service errors - these differ between modern and legacy
+    #[cfg(feature = "legacy-proto")]
+    pub use helium_proto_legacy::services::Error as ServiceConnectError;
+    #[cfg(not(feature = "legacy-proto"))]
+    pub use tonic::transport::Error as ServiceConnectError;
+
+    #[cfg(not(feature = "legacy-proto"))]
+    pub use tonic::Status as RpcStatus;
+    #[cfg(feature = "legacy-proto")]
+    pub use tonic_legacy::Status as RpcStatus;
+}
