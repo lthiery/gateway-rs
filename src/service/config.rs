@@ -7,11 +7,11 @@ use helium_proto::{
     services::{
         self,
         iot_config::{GatewayRegionParamsReqV1, GatewayRegionParamsResV1},
-        Channel, Endpoint,
     },
     Message,
 };
 use std::sync::Arc;
+use tonic::transport::{Channel, Endpoint};
 
 type ConfigClient = services::iot_config::GatewayClient<Channel>;
 

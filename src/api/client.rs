@@ -59,7 +59,7 @@ impl LocalClient {
             .await?;
 
         let encoded = response.into_inner().add_gateway_txn;
-        let envelope = BlockchainTxn::decode(encoded.as_ref())?;
+        let envelope = BlockchainTxn::decode(encoded.as_ref()).map_err(DecodeError::from)?;
         match envelope.txn {
             Some(Txn::AddGateway(txn)) => Ok(txn),
             _ => Err(DecodeError::invalid_envelope()),

@@ -20,9 +20,12 @@ mod base64;
 pub(crate) use crate::base64::Base64;
 pub use beacon::{Region, RegionParams};
 pub use error::{DecodeError, Error, Result};
+pub use helium_crypto;
+pub use helium_proto;
 pub use keyed_uri::KeyedUri;
 pub use keypair::{Keypair, PublicKey, Sign, Verify};
 pub use packet::{PacketDown, PacketUp};
+pub use semtech_udp;
 pub use settings::Settings;
 
 use futures::{Future as StdFuture, Stream as StdStream};
@@ -45,7 +48,9 @@ where
             keypair.as_ref().sign(&data).map_err(crate::Error::from)
         });
     join_handle
-        .map_err(|err| helium_crypto::Error::from(signature::Error::from_source(err)))
+        .map_err(|err| {
+            helium_crypto::Error::from(helium_crypto::signature::Error::from_source(err))
+        })
         .await?
 }
 

@@ -3,9 +3,9 @@ use crate::{
     Result,
 };
 use beacon::Entropy;
-use helium_proto::services::{self, poc_entropy::EntropyReqV1, Channel, Endpoint};
+use helium_proto::services::{self, poc_entropy::EntropyReqV1};
 use http::Uri;
-
+use tonic::transport::{Channel, Endpoint};
 type EntropyClient = helium_proto::services::poc_entropy::Client<Channel>;
 
 #[derive(Debug)]

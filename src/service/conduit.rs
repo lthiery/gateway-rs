@@ -3,11 +3,11 @@ use crate::{
     Error, Keypair, PublicKey, Result, Sign,
 };
 use futures::TryFutureExt;
-use helium_proto::services::{Channel, Endpoint};
 use http::Uri;
 use std::sync::Arc;
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;
+use tonic::transport::{Channel, Endpoint};
 use tracing::{info, warn};
 
 /// The time between TCP keepalive messages to keep the connection to the packet

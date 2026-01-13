@@ -6,7 +6,7 @@ edition = "2021"
 license = "Apache-2.0"
 
 [dependencies]
-bitfield = "0.14"
+bitfield = "0.19"
 bytes = "1"
 
 [dev-dependencies]

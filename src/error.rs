@@ -52,7 +52,7 @@ pub enum DecodeError {
     #[error("network address decode: {0}")]
     Addr(#[from] net::AddrParseError),
     #[error("protobuf decode {0}")]
-    Prost(#[from] prost::DecodeError),
+    Proto(#[from] helium_proto::DecodeError),
     #[error("lorawan decode: {0}")]
     LoraWan(#[from] lorawan::LoraWanError),
     #[error("crc is invalid and packet may be corrupted")]
@@ -72,7 +72,7 @@ pub enum DecodeError {
 #[derive(Error, Debug)]
 pub enum ServiceError {
     #[error("service {0}")]
-    Service(#[from] helium_proto::services::Error),
+    Service(#[from] tonic::transport::Error),
     #[error("rpc {0}")]
     Rpc(#[from] tonic::Status),
     #[error("stream closed")]
@@ -84,7 +84,9 @@ pub enum ServiceError {
     #[error("age {age}s > {max_age}s")]
     Check { age: u64, max_age: u64 },
     #[error("Unable to connect to local server. Check that `helium_gateway` is running.")]
-    LocalClientConnect(helium_proto::services::Error),
+    LocalClientConnect(tonic::transport::Error),
+    #[error("Error decoding protobuf message: {0}")]
+    ProtoDecode(#[from] helium_proto::DecodeError),
 }
 
 #[derive(Debug, Error)]
@@ -104,7 +106,7 @@ macro_rules! from_err {
 }
 
 // Service Errors
-from_err!(ServiceError, helium_proto::services::Error);
+from_err!(ServiceError, tonic::transport::Error);
 from_err!(ServiceError, tonic::Status);
 
 impl<T> From<tokio::sync::mpsc::error::SendError<T>> for Error {
@@ -188,7 +190,7 @@ impl Error {
         Error::Service(ServiceError::Check { age, max_age })
     }
 
-    pub fn local_client_connect(e: helium_proto::services::Error) -> Error {
+    pub fn local_client_connect(e: tonic::transport::Error) -> Error {
         Error::Service(ServiceError::LocalClientConnect(e))
     }
 }

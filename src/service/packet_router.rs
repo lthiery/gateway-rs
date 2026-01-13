@@ -4,12 +4,9 @@ use crate::{
     DecodeError, Error, Keypair, PublicKey, Result, Sign,
 };
 use helium_proto::{
-    services::{
-        router::{
-            envelope_down_v1, envelope_up_v1, EnvelopeDownV1, EnvelopeUpV1, PacketRouterClient,
-            PacketRouterPacketUpV1, PacketRouterRegisterV1, PacketRouterSessionInitV1,
-        },
-        Channel,
+    services::router::{
+        envelope_down_v1, envelope_up_v1, EnvelopeDownV1, EnvelopeUpV1, PacketRouterClient,
+        PacketRouterPacketUpV1, PacketRouterRegisterV1, PacketRouterSessionInitV1,
     },
     Message,
 };
@@ -21,7 +18,7 @@ use std::{
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;
 use tonic::async_trait;
-
+use tonic::transport::Channel;
 // The router service maintains a re-connectable connection to a remote packet
 // router. The service will connect when (re)connect or a packet send is
 // attempted. It will ensure that the register rpc is called on the constructed
