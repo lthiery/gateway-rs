@@ -2,10 +2,12 @@ use super::{
     AddGatewayReq, AddGatewayRes, PubkeyReq, PubkeyRes, RegionReq, RegionRes, RouterReq, RouterRes,
 };
 use crate::{packet_router, region_watcher, Error, Keypair, PublicKey, Result, Settings};
+use crate::proto::{
+    crypto::Sign,
+    services::local::{Api, Server},
+    BlockchainTxn, BlockchainTxnAddGatewayV1, Message, Txn,
+};
 use futures::TryFutureExt;
-use helium_crypto::Sign;
-use helium_proto::services::local::{Api, Server};
-use helium_proto::{BlockchainTxn, BlockchainTxnAddGatewayV1, Message, Txn};
 use std::{net::SocketAddr, sync::Arc};
 use tonic::{self, transport::Server as TransportServer, Request, Response, Status};
 use tracing::info;

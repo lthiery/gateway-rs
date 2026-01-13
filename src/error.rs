@@ -11,8 +11,12 @@ pub enum Error {
     Custom(String),
     #[error("io error: {0}")]
     IO(#[from] std::io::Error),
+    #[cfg(not(feature = "legacy-proto"))]
     #[error("crypto error: {0}")]
     CryptoError(#[from] helium_crypto::Error),
+    #[cfg(feature = "legacy-proto")]
+    #[error("crypto error: {0}")]
+    CryptoError(#[from] helium_crypto_legacy::Error),
     #[error("encode error: {0}")]
     Encode(#[from] EncodeError),
     #[error("decode error: {0}")]
@@ -21,8 +25,12 @@ pub enum Error {
     Service(#[from] ServiceError),
     #[error("semtech udp error: {0}")]
     Semtech(#[from] Box<semtech_udp::server_runtime::Error>),
+    #[cfg(not(feature = "legacy-proto"))]
     #[error("{0}")]
     Beacon(#[from] beacon::Error),
+    #[cfg(feature = "legacy-proto")]
+    #[error("{0}")]
+    Beacon(#[from] beacon_legacy::Error),
     #[error("gateway error: {0}")]
     Gateway(#[from] crate::gateway::GatewayError),
     #[error("region error: {0}")]
@@ -51,8 +59,12 @@ pub enum DecodeError {
     Base64(#[from] base64::DecodeError),
     #[error("network address decode: {0}")]
     Addr(#[from] net::AddrParseError),
+    #[cfg(not(feature = "legacy-proto"))]
     #[error("protobuf decode {0}")]
     Proto(#[from] helium_proto::DecodeError),
+    #[cfg(feature = "legacy-proto")]
+    #[error("protobuf decode {0}")]
+    Prost(#[from] prost::DecodeError),
     #[error("lorawan decode: {0}")]
     LoraWan(#[from] lorawan::LoraWanError),
     #[error("crc is invalid and packet may be corrupted")]
@@ -71,8 +83,12 @@ pub enum DecodeError {
 
 #[derive(Error, Debug)]
 pub enum ServiceError {
+    #[cfg(not(feature = "legacy-proto"))]
     #[error("service {0}")]
     Service(#[from] tonic::transport::Error),
+    #[cfg(feature = "legacy-proto")]
+    #[error("service {0}")]
+    Service(#[from] helium_proto_legacy::services::Error),
     #[error("rpc {0}")]
     Rpc(#[from] tonic::Status),
     #[error("stream closed")]
@@ -83,8 +99,13 @@ pub enum ServiceError {
     NoSession,
     #[error("age {age}s > {max_age}s")]
     Check { age: u64, max_age: u64 },
+    #[cfg(not(feature = "legacy-proto"))]
     #[error("Unable to connect to local server. Check that `helium_gateway` is running.")]
     LocalClientConnect(tonic::transport::Error),
+    #[cfg(feature = "legacy-proto")]
+    #[error("Unable to connect to local server. Check that `helium_gateway` is running.")]
+    LocalClientConnect(helium_proto_legacy::services::Error),
+    #[cfg(not(feature = "legacy-proto"))]
     #[error("Error decoding protobuf message: {0}")]
     ProtoDecode(#[from] helium_proto::DecodeError),
 }
@@ -106,8 +127,11 @@ macro_rules! from_err {
 }
 
 // Service Errors
+#[cfg(not(feature = "legacy-proto"))]
 from_err!(ServiceError, tonic::transport::Error);
 from_err!(ServiceError, tonic::Status);
+#[cfg(feature = "legacy-proto")]
+from_err!(ServiceError, helium_proto_legacy::services::Error);
 
 impl<T> From<tokio::sync::mpsc::error::SendError<T>> for Error {
     fn from(_err: tokio::sync::mpsc::error::SendError<T>) -> Self {
@@ -190,7 +214,13 @@ impl Error {
         Error::Service(ServiceError::Check { age, max_age })
     }
 
+    #[cfg(not(feature = "legacy-proto"))]
     pub fn local_client_connect(e: tonic::transport::Error) -> Error {
+        Error::Service(ServiceError::LocalClientConnect(e))
+    }
+
+    #[cfg(feature = "legacy-proto")]
+    pub fn local_client_connect(e: helium_proto_legacy::services::Error) -> Error {
         Error::Service(ServiceError::LocalClientConnect(e))
     }
 }

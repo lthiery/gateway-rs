@@ -1,19 +1,23 @@
 use crate::{
+    proto::{
+        beacon::Entropy,
+        services::{self, poc_entropy::EntropyReqV1},
+        transport::{Channel, Endpoint},
+    },
     service::{CONNECT_TIMEOUT, RPC_TIMEOUT},
     Result,
 };
-use beacon::Entropy;
-use helium_proto::services::{self, poc_entropy::EntropyReqV1};
 use http::Uri;
-use tonic::transport::{Channel, Endpoint};
-type EntropyClient = helium_proto::services::poc_entropy::Client<Channel>;
+
+type EntropyClient = services::poc_entropy::Client<Channel>;
 
 #[derive(Debug)]
 pub struct EntropyService(EntropyClient);
 
 impl EntropyService {
     pub fn new(uri: Uri) -> Self {
-        let channel = Endpoint::from(uri)
+        let channel = Endpoint::try_from(uri.to_string())
+            .expect("valid uri")
             .connect_timeout(CONNECT_TIMEOUT)
             .timeout(RPC_TIMEOUT)
             .connect_lazy();

@@ -1,7 +1,10 @@
 use crate::{DecodeError, Error, PublicKey, Region, Result};
-use helium_proto::services::{
-    poc_lora,
-    router::{PacketRouterPacketDownV1, PacketRouterPacketUpV1},
+use crate::proto::{
+    beacon,
+    services::{
+        poc_lora,
+        router::{PacketRouterPacketDownV1, PacketRouterPacketUpV1},
+    },
 };
 use lorawan::{Direction, PHYPayloadFrame, MHDR};
 use semtech_udp::{
@@ -233,7 +236,7 @@ pub(crate) fn to_mhz<H: Into<f64>>(hz: H) -> f64 {
 
 pub(crate) mod datarate {
     use super::{DecodeError, Result};
-    use helium_proto::DataRate as ProtoRate;
+    use crate::proto::DataRate as ProtoRate;
     use semtech_udp::{Bandwidth, DataRate, SpreadingFactor};
 
     pub fn from_proto(rate: ProtoRate) -> Result<DataRate> {

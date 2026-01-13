@@ -1,5 +1,10 @@
-use crate::{api::LocalClient, cmd::*, settings::StakingMode, Base64, PublicKey, Result, Settings};
-use helium_proto::{BlockchainTxn, BlockchainTxnAddGatewayV1, Message, Txn};
+use crate::{
+    api::LocalClient,
+    cmd::*,
+    proto::{BlockchainTxn, BlockchainTxnAddGatewayV1, Message, Txn},
+    settings::StakingMode,
+    Base64, PublicKey, Result, Settings,
+};
 use serde_json::json;
 
 /// Construct an add gateway transaction for this gateway.
@@ -44,7 +49,7 @@ fn print_txn(mode: &StakingMode, txn: BlockchainTxnAddGatewayV1) -> Result {
 }
 
 fn parse_pubkey(str: &str) -> Result<PublicKey> {
-    use helium_crypto::{ed25519, ReadFrom};
+    use crate::proto::crypto::{ed25519, ReadFrom};
     use std::{io::Cursor, str::FromStr};
 
     match PublicKey::from_str(str) {
@@ -57,7 +62,7 @@ fn parse_pubkey(str: &str) -> Result<PublicKey> {
     }
 }
 
-fn solana_pubkey(key: PublicKey) -> std::result::Result<String, helium_crypto::Error> {
+fn solana_pubkey(key: PublicKey) -> std::result::Result<String, crate::proto::crypto::Error> {
     let bytes = &key.to_vec()[1..];
     Ok(bs58::encode(bytes).into_string())
 }

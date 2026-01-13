@@ -3,11 +3,12 @@ use crate::{
     service::conduit::{ConduitClient, ConduitService},
     DecodeError, Keypair, PublicKey, Result, Sign,
 };
-use helium_proto::{
+use crate::proto::{
     services::poc_lora::{
         self, lora_stream_request_v1, lora_stream_response_v1, LoraBeaconReportReqV1,
         LoraStreamRequestV1, LoraStreamResponseV1, LoraWitnessReportReqV1,
     },
+    transport::Channel,
     Message as ProtoMessage,
 };
 use http::Uri;
@@ -15,7 +16,6 @@ use std::sync::Arc;
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;
 use tonic::async_trait;
-use tonic::transport::Channel;
 // The poc service maintains a re-connectable connection to a remote poc
 // ingester. The service will (re)connect when a poc report send is attempted.
 // It will ensure that the stream_requests rpc is called on the constructed

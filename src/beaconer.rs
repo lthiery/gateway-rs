@@ -8,7 +8,7 @@ use crate::{
     sync, Base64, DecodeError, PacketUp, PublicKey, RegionParams, Result,
 };
 use futures::TryFutureExt;
-use helium_proto::services::poc_lora::{self, lora_stream_response_v1};
+use crate::proto::{beacon, services::poc_lora::{self, lora_stream_response_v1}};
 use http::Uri;
 use std::sync::Arc;
 use std::time::Instant;

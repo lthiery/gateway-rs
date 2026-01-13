@@ -4,10 +4,10 @@ use crate::{
     service::{packet_router::PacketRouterService, Reconnect},
     sync, Base64, PacketUp, PublicKey, Result, Settings,
 };
-use futures::TryFutureExt;
-use helium_proto::services::router::{
+use crate::proto::services::router::{
     envelope_down_v1, PacketRouterPacketDownV1, PacketRouterPacketUpV1, PacketRouterSessionOfferV1,
 };
+use futures::TryFutureExt;
 use serde::Serialize;
 use std::{ops::Deref, time::Instant as StdInstant};
 use tokio::time::Duration;

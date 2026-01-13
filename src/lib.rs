@@ -8,6 +8,7 @@ pub mod message_cache;
 pub mod packet;
 
 pub mod packet_router;
+pub mod proto;
 pub mod region_watcher;
 pub mod server;
 pub mod service;
@@ -18,13 +19,14 @@ mod api;
 mod base64;
 
 pub(crate) use crate::base64::Base64;
-pub use beacon::{Region, RegionParams};
 pub use error::{DecodeError, Error, Result};
-pub use helium_crypto;
-pub use helium_proto;
 pub use keyed_uri::KeyedUri;
 pub use keypair::{Keypair, PublicKey, Sign, Verify};
 pub use packet::{PacketDown, PacketUp};
+pub use proto::{Region, RegionParams};
+// Re-export for backwards compatibility
+pub use proto::crypto as helium_crypto;
+pub use proto::services as helium_proto;
 pub use semtech_udp;
 pub use settings::Settings;
 
@@ -41,16 +43,14 @@ async fn sign<K>(keypair: K, data: Vec<u8>) -> Result<Vec<u8>>
 where
     K: AsRef<Keypair> + std::marker::Send + 'static,
 {
+    use crate::proto::crypto::{self, Sign};
     use futures::TryFutureExt;
-    use helium_crypto::Sign;
     let join_handle: tokio::task::JoinHandle<Result<Vec<u8>>> =
         tokio::task::spawn_blocking(move || {
             keypair.as_ref().sign(&data).map_err(crate::Error::from)
         });
     join_handle
-        .map_err(|err| {
-            helium_crypto::Error::from(helium_crypto::signature::Error::from_source(err))
-        })
+        .map_err(|err| crypto::Error::from(crypto::signature::Error::from_source(err)))
         .await?
 }
 
@@ -74,7 +74,7 @@ macro_rules! impl_verify {
     ($type: ty) => {
         impl crate::Verify for $type {
             fn verify(&self, pub_key: &crate::PublicKey) -> Result {
-                use helium_crypto::Verify as _;
+                use crate::proto::crypto::Verify as _;
                 let mut _msg = self.clone();
                 _msg.signature = vec![];
                 let buf = _msg.encode_to_vec();

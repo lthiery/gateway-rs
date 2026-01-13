@@ -2,12 +2,12 @@ use crate::{
     service::{CONNECT_TIMEOUT, RPC_TIMEOUT},
     Error, Keypair, PublicKey, Result, Sign,
 };
+use crate::proto::transport::{Channel, Endpoint};
 use futures::TryFutureExt;
 use http::Uri;
 use std::sync::Arc;
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;
-use tonic::transport::{Channel, Endpoint};
 use tracing::{info, warn};
 
 /// The time between TCP keepalive messages to keep the connection to the packet
@@ -58,7 +58,8 @@ impl<U, D> Conduit<U, D> {
         client: &mut C,
         keypair: Arc<Keypair>,
     ) -> Result<Self> {
-        let endpoint = Endpoint::from(uri)
+        let endpoint = Endpoint::try_from(uri.to_string())
+            .expect("valid uri")
             .timeout(RPC_TIMEOUT)
             .connect_timeout(CONNECT_TIMEOUT)
             .tcp_keepalive(Some(TCP_KEEP_ALIVE_DURATION))

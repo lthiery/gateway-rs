@@ -5,11 +5,12 @@ use crate::{
     settings::{ListenAddress, StakingMode},
     PublicKey, Region, Result,
 };
-use helium_proto::{
-    services::local::Client, BlockchainTxn, BlockchainTxnAddGatewayV1, Message, Txn,
+use crate::proto::{
+    services::local::Client,
+    transport::{Channel, Endpoint},
+    BlockchainTxn, BlockchainTxnAddGatewayV1, Message, Txn,
 };
 use std::convert::TryFrom;
-use tonic::transport::{Channel, Endpoint};
 
 pub struct LocalClient {
     client: Client<Channel>,

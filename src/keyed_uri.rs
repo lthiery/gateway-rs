@@ -38,9 +38,9 @@ impl fmt::Debug for KeyedUri {
     }
 }
 
-impl TryFrom<helium_proto::services::local::KeyedUri> for KeyedUri {
+impl TryFrom<crate::proto::services::local::KeyedUri> for KeyedUri {
     type Error = crate::Error;
-    fn try_from(v: helium_proto::services::local::KeyedUri) -> Result<Self> {
+    fn try_from(v: crate::proto::services::local::KeyedUri) -> Result<Self> {
         let result = Self {
             uri: http::Uri::from_str(&v.uri)?,
             pubkey: Arc::new(PublicKey::from_bytes(v.address)?),
@@ -49,18 +49,18 @@ impl TryFrom<helium_proto::services::local::KeyedUri> for KeyedUri {
     }
 }
 
-impl From<KeyedUri> for helium_proto::services::local::KeyedUri {
+impl From<KeyedUri> for crate::proto::services::local::KeyedUri {
     fn from(v: KeyedUri) -> Self {
-        helium_proto::services::local::KeyedUri {
+        crate::proto::services::local::KeyedUri {
             address: v.pubkey.to_vec(),
             uri: v.uri.to_string(),
         }
     }
 }
 
-impl TryFrom<helium_proto::RoutingAddress> for KeyedUri {
+impl TryFrom<crate::proto::RoutingAddress> for KeyedUri {
     type Error = crate::Error;
-    fn try_from(v: helium_proto::RoutingAddress) -> Result<Self> {
+    fn try_from(v: crate::proto::RoutingAddress) -> Result<Self> {
         let result = Self {
             uri: http::Uri::from_str(&String::from_utf8_lossy(&v.uri))?,
             pubkey: Arc::new(PublicKey::from_bytes(v.pub_key)?),

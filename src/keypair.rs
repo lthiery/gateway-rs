@@ -1,9 +1,9 @@
-use crate::{DecodeError, Error, Result};
+use crate::proto::crypto::{KeyTag, KeyType, Network};
 #[cfg(feature = "ecc608")]
-use helium_crypto::ecc608;
+use crate::proto::crypto::ecc608;
 #[cfg(feature = "tpm")]
-use helium_crypto::tpm;
-use helium_crypto::{KeyTag, KeyType, Network};
+use crate::proto::crypto::tpm;
+use crate::{DecodeError, Error, Result};
 use http::Uri;
 use rand::rngs::OsRng;
 use serde::{de, Deserializer};
@@ -13,8 +13,8 @@ use std::{collections::HashMap, convert::TryFrom, fmt, fs, io, path, str::FromSt
 use tonic::async_trait;
 
 #[derive(Debug)]
-pub struct Keypair(helium_crypto::Keypair);
-pub type PublicKey = helium_crypto::PublicKey;
+pub struct Keypair(crate::proto::crypto::Keypair);
+pub type PublicKey = crate::proto::crypto::PublicKey;
 
 #[async_trait]
 pub trait Sign {
@@ -36,8 +36,8 @@ macro_rules! uri_error {
     };
 }
 
-impl From<helium_crypto::Keypair> for Keypair {
-    fn from(v: helium_crypto::Keypair) -> Self {
+impl From<crate::proto::crypto::Keypair> for Keypair {
+    fn from(v: crate::proto::crypto::Keypair) -> Self {
         Self(v)
     }
 }
@@ -54,7 +54,7 @@ impl FromStr for Keypair {
                 Err(Error::IO(io_error)) if io_error.kind() == std::io::ErrorKind::NotFound => {
                     let args = KeypairArgs::from_uri(&url)?;
                     let network = args.get::<Network>("network", Network::MainNet)?;
-                    let new_key: Keypair = helium_crypto::Keypair::generate(
+                    let new_key: Keypair = crate::proto::crypto::Keypair::generate(
                         KeyTag {
                             network,
                             key_type: KeyType::Ed25519,
@@ -92,7 +92,7 @@ impl FromStr for Keypair {
                     })
                     .and_then(|_| {
                         ecc608::Keypair::from_slot(network, slot)
-                            .map(helium_crypto::Keypair::from)
+                            .map(crate::proto::crypto::Keypair::from)
                             .map_err(|err| {
                                 uri_error!("could not load ecc keypair in slot {slot}: {err:?}")
                             })
@@ -111,8 +111,8 @@ impl FromStr for Keypair {
                         network,
                         u32::from_str_radix(&key_identifier[2..], 16).unwrap(),
                     )
-                    .map(helium_crypto::Keypair::from),
-                    _ => Err(helium_crypto::Error::invalid_keytype_str(
+                    .map(crate::proto::crypto::Keypair::from),
+                    _ => Err(crate::proto::crypto::Error::invalid_keytype_str(
                         "unknown tpm key access type",
                     )),
                 }
@@ -126,7 +126,7 @@ impl FromStr for Keypair {
 }
 
 impl std::ops::Deref for Keypair {
-    type Target = helium_crypto::Keypair;
+    type Target = crate::proto::crypto::Keypair;
     fn deref(&self) -> &Self::Target {
         &self.0
     }
@@ -134,7 +134,7 @@ impl std::ops::Deref for Keypair {
 
 impl Keypair {
     pub fn new() -> Self {
-        let keypair = helium_crypto::Keypair::generate(
+        let keypair = crate::proto::crypto::Keypair::generate(
             KeyTag {
                 network: Network::MainNet,
                 key_type: KeyType::Ed25519,
@@ -146,7 +146,7 @@ impl Keypair {
 
     pub fn load_from_file(path: &str) -> Result<Self> {
         let data = fs::read(path)?;
-        Ok(helium_crypto::Keypair::try_from(&data[..])?.into())
+        Ok(crate::proto::crypto::Keypair::try_from(&data[..])?.into())
     }
 
     pub fn save_to_file(&self, path: &str) -> io::Result<()> {

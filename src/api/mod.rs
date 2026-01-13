@@ -2,7 +2,7 @@ mod client;
 mod server;
 
 pub use client::LocalClient;
-pub use helium_proto::{
+pub use crate::proto::{
     services::local::{
         AddGatewayReq, AddGatewayRes, PubkeyReq, PubkeyRes, RegionReq, RegionRes, RouterReq,
         RouterRes,

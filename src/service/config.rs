@@ -3,15 +3,15 @@ use crate::{
     service::{CONNECT_TIMEOUT, RPC_TIMEOUT},
     KeyedUri, Keypair, Region, RegionParams, Result, Sign, Verify,
 };
-use helium_proto::{
+use crate::proto::{
     services::{
         self,
         iot_config::{GatewayRegionParamsReqV1, GatewayRegionParamsResV1},
     },
+    transport::{Channel, Endpoint},
     Message,
 };
 use std::sync::Arc;
-use tonic::transport::{Channel, Endpoint};
 
 type ConfigClient = services::iot_config::GatewayClient<Channel>;
 
@@ -23,7 +23,8 @@ pub struct ConfigService {
 
 impl ConfigService {
     pub fn new(keyed_uri: &KeyedUri) -> Self {
-        let channel = Endpoint::from(keyed_uri.uri.clone())
+        let channel = Endpoint::try_from(keyed_uri.uri.to_string())
+            .expect("valid uri")
             .connect_timeout(CONNECT_TIMEOUT)
             .timeout(RPC_TIMEOUT)
             .connect_lazy();

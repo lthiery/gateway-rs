@@ -18,13 +18,9 @@ members = ["lorawan"]
 byteorder = "1"
 serde = { version = "1", features = ["rc", "derive"] }
 rust_decimal = { version = "1", features = ["serde-with-float"] }
-helium-proto = { git = "https://github.com/helium/proto", branch = "master", features = [
-    "services",
-] }
 rand = "0.8"
 base64 = ">=0.21"
 sha2 = "0"
-thiserror = "2"
 prost = "0"
 
 [dependencies]
@@ -41,7 +37,8 @@ serde = { workspace = true }
 serde_json = "1"
 serde_urlencoded = "*"
 http-serde = "2"
-tokio = { version = "1.49", default-features = false, features = [
+thiserror = "2"
+tokio = { version = "1", default-features = false, features = [
     "macros",
     "signal",
     "rt",
@@ -59,28 +56,44 @@ tracing-subscriber = { version = "0", default-features = false, features = [
     "std",
 ] }
 tracing-appender = "0"
-thiserror = { workspace = true }
 rand = { workspace = true }
 prost = { workspace = true }
-tonic = "0.14"
-http = "1.3"
 sha2 = { workspace = true }
 base64 = { workspace = true }
-helium-proto = { workspace = true }
 angry-purple-tiger = "1"
 lorawan = { package = "lorawan", path = "lorawan" }
-beacon = { git = "https://github.com/helium/proto", branch = "master" }
 exponential-backoff = { git = "https://github.com/yoshuawuyts/exponential-backoff", branch = "master" }
 semtech-udp = { version = ">=0.12", default-features = false, features = [
     "server",
 ] }
-helium-crypto = { git = "https://github.com/lthiery/helium-crypto-rs", branch = "main" }
 time = { version = ">=0.3", features = ["std"] }
+http = "1"
+
+# Both proto stacks use tonic 0.10
+tonic = "0.10"
+
+# Modern proto stack (helium-proto master, requires Cargo with workspace inheritance)
+helium-proto = { git = "https://github.com/helium/proto", branch = "master", features = ["services"], optional = true }
+beacon = { git = "https://github.com/helium/proto", branch = "master", optional = true }
+helium-crypto = { git = "https://github.com/lthiery/helium-crypto-rs", branch = "main", optional = true }
+
+# Legacy proto stack (works with Rust 1.72.1/Cargo 1.72 for mips)
+signature = { version = "1", features = ["std"], optional = true }
+helium-proto-legacy = { package = "helium-proto", git = "https://github.com/helium/proto", rev = "c828e0399f88ebbd6d13c8de39c25d70b9440f5b", features = ["services"], optional = true }
+beacon-legacy = { package = "beacon", git = "https://github.com/helium/proto", rev = "c828e0399f88ebbd6d13c8de39c25d70b9440f5b", optional = true }
+helium-crypto-legacy = { package = "helium-crypto", version = ">=0.8.3", optional = true }
 
 [features]
-default = ["ecc608"]
-ecc608 = ["helium-crypto/ecc608"]
-tpm = ["helium-crypto/tpm"]
+default = ["modern-proto", "ecc608"]
+modern-proto = ["helium-proto", "beacon", "helium-crypto"]
+legacy-proto = [
+    "signature",
+    "helium-proto-legacy",
+    "beacon-legacy",
+    "helium-crypto-legacy",
+]
+ecc608 = ["helium-crypto?/ecc608", "helium-crypto-legacy?/ecc608"]
+tpm = ["helium-crypto?/tpm", "helium-crypto-legacy?/tpm"]
 
 [dev-dependencies]
 time = { version = ">=0.3", features = ["std", "macros"] }

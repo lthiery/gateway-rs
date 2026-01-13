@@ -2,7 +2,7 @@ use crate::{
     beaconer, packet, packet_router, region_watcher, sync, DecodeError, Error, PacketDown,
     PacketUp, PublicKey, RegionParams, Result, Settings,
 };
-use beacon::Beacon;
+use crate::proto::beacon::Beacon;
 use lorawan::PHYPayload;
 use semtech_udp::{
     pull_resp::{self, Time},
