@@ -75,9 +75,9 @@ http = "1"
 tonic = { version = "0.14", optional = true }
 tonic-legacy = { package = "tonic", version = "0.10", optional = true }
 
-# Modern proto stack (helium-proto master, requires Cargo with workspace inheritance)
-helium-proto = { git = "https://github.com/helium/proto", branch = "master", features = ["services"], optional = true }
-beacon = { git = "https://github.com/helium/proto", branch = "master", optional = true }
+# Modern proto stack (pinned to specific commit for reproducible builds)
+helium-proto = { git = "https://github.com/helium/proto", rev = "3dbaedf3a39ab79cabd3b80cf7c648bf23d3c3f8", features = ["services"], optional = true }
+beacon = { git = "https://github.com/helium/proto", rev = "3dbaedf3a39ab79cabd3b80cf7c648bf23d3c3f8", optional = true }
 helium-crypto = { git = "https://github.com/lthiery/helium-crypto-rs", branch = "main", optional = true }
 
 # Legacy proto stack (works with Rust 1.72.1/Cargo 1.72 for mips)

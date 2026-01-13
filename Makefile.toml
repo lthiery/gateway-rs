@@ -1,6 +1,6 @@
 [env]
 CROSS_TARGET = "${CARGO_MAKE_PROFILE}"
-FEATURES = "ecc608"
+FEATURES = "modern-proto,ecc608"
 BUILD_COMMAND = "cross"
 TAR = { source = "${CARGO_MAKE_RUST_TARGET_OS}", default_value = "linux", mapping = { macos = "gtar", linux = "tar" } }
 
