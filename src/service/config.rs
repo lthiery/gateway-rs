@@ -1,8 +1,3 @@
-use crate::{
-    impl_sign, impl_verify,
-    service::{CONNECT_TIMEOUT, RPC_TIMEOUT},
-    KeyedUri, Keypair, Region, RegionParams, Result, Sign, Verify,
-};
 use crate::proto::{
     services::{
         self,
@@ -10,6 +5,11 @@ use crate::proto::{
     },
     transport::{Channel, Endpoint},
     Message,
+};
+use crate::{
+    impl_sign, impl_verify,
+    service::{CONNECT_TIMEOUT, RPC_TIMEOUT},
+    KeyedUri, Keypair, Region, RegionParams, Result, Sign, Verify,
 };
 use std::sync::Arc;
 

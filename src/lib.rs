@@ -1,3 +1,6 @@
+// Pre-existing large error type - would require significant refactoring to fix
+#![allow(clippy::result_large_err)]
+
 pub mod beaconer;
 pub mod cmd;
 pub mod error;
@@ -43,20 +46,19 @@ async fn sign<K>(keypair: K, data: Vec<u8>) -> Result<Vec<u8>>
 where
     K: AsRef<Keypair> + std::marker::Send + 'static,
 {
-    use crate::proto::crypto::{self, Sign};
-    use futures::TryFutureExt;
+    use crate::proto::crypto::Sign;
     let join_handle: tokio::task::JoinHandle<Result<Vec<u8>>> =
         tokio::task::spawn_blocking(move || {
             keypair.as_ref().sign(&data).map_err(crate::Error::from)
         });
     join_handle
-        .map_err(|err| crypto::Error::from(crypto::signature::Error::from_source(err)))
-        .await?
+        .await
+        .map_err(|err| crate::Error::custom(format!("signing task failed: {err}")))?
 }
 
 macro_rules! impl_sign {
     ($type: ty) => {
-        #[tonic::async_trait]
+        #[crate::proto::tonic::async_trait]
         impl Sign for $type {
             async fn sign<K>(&mut self, keypair: K) -> Result
             where

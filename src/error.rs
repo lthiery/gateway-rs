@@ -41,8 +41,12 @@ pub enum Error {
 
 #[derive(Error, Debug)]
 pub enum EncodeError {
+    #[cfg(not(feature = "legacy-proto"))]
     #[error("protobuf encode")]
-    Prost(#[from] prost::EncodeError),
+    Prost(#[from] helium_proto::EncodeError),
+    #[cfg(feature = "legacy-proto")]
+    #[error("protobuf encode")]
+    Prost(#[from] helium_proto_legacy::EncodeError),
 }
 
 #[derive(Error, Debug)]
@@ -64,7 +68,7 @@ pub enum DecodeError {
     Proto(#[from] helium_proto::DecodeError),
     #[cfg(feature = "legacy-proto")]
     #[error("protobuf decode {0}")]
-    Prost(#[from] prost::DecodeError),
+    Prost(#[from] helium_proto_legacy::DecodeError),
     #[error("lorawan decode: {0}")]
     LoraWan(#[from] lorawan::LoraWanError),
     #[error("crc is invalid and packet may be corrupted")]
@@ -89,8 +93,12 @@ pub enum ServiceError {
     #[cfg(feature = "legacy-proto")]
     #[error("service {0}")]
     Service(#[from] helium_proto_legacy::services::Error),
+    #[cfg(not(feature = "legacy-proto"))]
     #[error("rpc {0}")]
     Rpc(#[from] tonic::Status),
+    #[cfg(feature = "legacy-proto")]
+    #[error("rpc {0}")]
+    Rpc(#[from] tonic_legacy::Status),
     #[error("stream closed")]
     Stream,
     #[error("channel closed")]
@@ -129,7 +137,10 @@ macro_rules! from_err {
 // Service Errors
 #[cfg(not(feature = "legacy-proto"))]
 from_err!(ServiceError, tonic::transport::Error);
+#[cfg(not(feature = "legacy-proto"))]
 from_err!(ServiceError, tonic::Status);
+#[cfg(feature = "legacy-proto")]
+from_err!(ServiceError, tonic_legacy::Status);
 #[cfg(feature = "legacy-proto")]
 from_err!(ServiceError, helium_proto_legacy::services::Error);
 
@@ -140,7 +151,10 @@ impl<T> From<tokio::sync::mpsc::error::SendError<T>> for Error {
 }
 
 // Encode Errors
-from_err!(EncodeError, prost::EncodeError);
+#[cfg(not(feature = "legacy-proto"))]
+from_err!(EncodeError, helium_proto::EncodeError);
+#[cfg(feature = "legacy-proto")]
+from_err!(EncodeError, helium_proto_legacy::EncodeError);
 
 // Decode Errors
 from_err!(DecodeError, http::uri::InvalidUri);
@@ -148,7 +162,10 @@ from_err!(DecodeError, base64::DecodeError);
 from_err!(DecodeError, bs58::decode::Error);
 from_err!(DecodeError, serde_json::Error);
 from_err!(DecodeError, net::AddrParseError);
-from_err!(DecodeError, prost::DecodeError);
+#[cfg(not(feature = "legacy-proto"))]
+from_err!(DecodeError, helium_proto::DecodeError);
+#[cfg(feature = "legacy-proto")]
+from_err!(DecodeError, helium_proto_legacy::DecodeError);
 from_err!(DecodeError, lorawan::LoraWanError);
 
 impl DecodeError {
@@ -162,10 +179,6 @@ impl DecodeError {
 
     pub fn crc_disabled() -> Error {
         Error::Decode(DecodeError::CrcInvalid)
-    }
-
-    pub fn prost_decode(msg: &'static str) -> Error {
-        Error::Decode(prost::DecodeError::new(msg).into())
     }
 
     pub fn keypair_uri<T: ToString>(msg: T) -> Error {

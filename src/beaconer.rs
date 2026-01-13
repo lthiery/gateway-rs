@@ -1,4 +1,8 @@
 //! This module provides proof-of-coverage (PoC) beaconing support.
+use crate::proto::{
+    beacon,
+    services::poc_lora::{self, lora_stream_response_v1},
+};
 use crate::{
     gateway::{self, BeaconResp},
     message_cache::MessageCache,
@@ -8,7 +12,6 @@ use crate::{
     sync, Base64, DecodeError, PacketUp, PublicKey, RegionParams, Result,
 };
 use futures::TryFutureExt;
-use crate::proto::{beacon, services::poc_lora::{self, lora_stream_response_v1}};
 use http::Uri;
 use std::sync::Arc;
 use std::time::Instant;

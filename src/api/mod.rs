@@ -1,7 +1,6 @@
 mod client;
 mod server;
 
-pub use client::LocalClient;
 pub use crate::proto::{
     services::local::{
         AddGatewayReq, AddGatewayRes, PubkeyReq, PubkeyRes, RegionReq, RegionRes, RouterReq,
@@ -9,6 +8,7 @@ pub use crate::proto::{
     },
     GatewayStakingMode,
 };
+pub use client::LocalClient;
 pub use server::LocalServer;
 
 use crate::{Error, PublicKey, Result};

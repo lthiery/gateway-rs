@@ -1,3 +1,6 @@
+// Pre-existing large error type - would require significant refactoring to fix
+#![allow(clippy::result_large_err)]
+
 use clap::Parser;
 use gateway_rs::{cmd, error::Result, settings::Settings};
 use std::path::PathBuf;

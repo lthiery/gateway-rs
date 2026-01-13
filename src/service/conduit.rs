@@ -1,8 +1,8 @@
+use crate::proto::transport::{Channel, Endpoint};
 use crate::{
     service::{CONNECT_TIMEOUT, RPC_TIMEOUT},
     Error, Keypair, PublicKey, Result, Sign,
 };
-use crate::proto::transport::{Channel, Endpoint};
 use futures::TryFutureExt;
 use http::Uri;
 use std::sync::Arc;
@@ -31,10 +31,10 @@ pub struct ConduitService<U, D, C: ConduitClient<U, D>> {
 #[derive(Debug)]
 struct Conduit<U, D> {
     tx: mpsc::Sender<U>,
-    rx: tonic::Streaming<D>,
+    rx: crate::proto::tonic::Streaming<D>,
 }
 
-#[tonic::async_trait]
+#[crate::proto::tonic::async_trait]
 pub trait ConduitClient<U, D> {
     async fn init(
         &mut self,
@@ -42,7 +42,7 @@ pub trait ConduitClient<U, D> {
         tx: mpsc::Sender<U>,
         client_rx: ReceiverStream<U>,
         keypair: Arc<Keypair>,
-    ) -> Result<tonic::Streaming<D>>;
+    ) -> Result<crate::proto::tonic::Streaming<D>>;
 
     async fn mk_session_init(
         &self,

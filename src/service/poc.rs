@@ -1,8 +1,4 @@
-use crate::{
-    impl_sign,
-    service::conduit::{ConduitClient, ConduitService},
-    DecodeError, Keypair, PublicKey, Result, Sign,
-};
+use crate::proto::tonic::async_trait;
 use crate::proto::{
     services::poc_lora::{
         self, lora_stream_request_v1, lora_stream_response_v1, LoraBeaconReportReqV1,
@@ -11,11 +7,15 @@ use crate::proto::{
     transport::Channel,
     Message as ProtoMessage,
 };
+use crate::{
+    impl_sign,
+    service::conduit::{ConduitClient, ConduitService},
+    DecodeError, Keypair, PublicKey, Result, Sign,
+};
 use http::Uri;
 use std::sync::Arc;
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;
-use tonic::async_trait;
 // The poc service maintains a re-connectable connection to a remote poc
 // ingester. The service will (re)connect when a poc report send is attempted.
 // It will ensure that the stream_requests rpc is called on the constructed
@@ -34,7 +34,7 @@ impl ConduitClient<LoraStreamRequestV1, LoraStreamResponseV1> for PocIotConduitC
         _tx: mpsc::Sender<LoraStreamRequestV1>,
         client_rx: ReceiverStream<LoraStreamRequestV1>,
         _keypair: Arc<Keypair>,
-    ) -> Result<tonic::Streaming<LoraStreamResponseV1>> {
+    ) -> Result<crate::proto::tonic::Streaming<LoraStreamResponseV1>> {
         let mut client = poc_lora::Client::<Channel>::new(endpoint);
         let rx = client.stream_requests(client_rx).await?.into_inner();
         Ok(rx)

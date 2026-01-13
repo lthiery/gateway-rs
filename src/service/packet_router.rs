@@ -1,8 +1,4 @@
-use crate::{
-    impl_sign,
-    service::conduit::{ConduitClient, ConduitService},
-    DecodeError, Error, Keypair, PublicKey, Result, Sign,
-};
+use crate::proto::tonic::async_trait;
 use crate::proto::{
     services::router::{
         envelope_down_v1, envelope_up_v1, EnvelopeDownV1, EnvelopeUpV1, PacketRouterClient,
@@ -11,6 +7,11 @@ use crate::proto::{
     transport::Channel,
     Message,
 };
+use crate::{
+    impl_sign,
+    service::conduit::{ConduitClient, ConduitService},
+    DecodeError, Error, Keypair, PublicKey, Result, Sign,
+};
 use http::Uri;
 use std::{
     sync::Arc,
@@ -18,7 +19,6 @@ use std::{
 };
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;
-use tonic::async_trait;
 // The router service maintains a re-connectable connection to a remote packet
 // router. The service will connect when (re)connect or a packet send is
 // attempted. It will ensure that the register rpc is called on the constructed
@@ -37,7 +37,7 @@ impl ConduitClient<EnvelopeUpV1, EnvelopeDownV1> for PacketRouterConduitClient {
         tx: mpsc::Sender<EnvelopeUpV1>,
         client_rx: ReceiverStream<EnvelopeUpV1>,
         keypair: Arc<Keypair>,
-    ) -> Result<tonic::Streaming<EnvelopeDownV1>> {
+    ) -> Result<crate::proto::tonic::Streaming<EnvelopeDownV1>> {
         let mut client = PacketRouterClient::<Channel>::new(endpoint);
         let rx = client.route(client_rx).await?.into_inner();
         let mut msg = PacketRouterRegisterV1 {

@@ -1,14 +1,14 @@
 use super::{AddGatewayReq, GatewayStakingMode, PubkeyReq, RegionReq, RouterReq};
+use crate::proto::{
+    services::local::Client,
+    transport::{Channel, Endpoint},
+    BlockchainTxn, BlockchainTxnAddGatewayV1, Message, Txn,
+};
 use crate::{
     error::{DecodeError, Error},
     packet_router::RouterStatus,
     settings::{ListenAddress, StakingMode},
     PublicKey, Region, Result,
-};
-use crate::proto::{
-    services::local::Client,
-    transport::{Channel, Endpoint},
-    BlockchainTxn, BlockchainTxnAddGatewayV1, Message, Txn,
 };
 use std::convert::TryFrom;
 

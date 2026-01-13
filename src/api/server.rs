@@ -1,15 +1,15 @@
 use super::{
     AddGatewayReq, AddGatewayRes, PubkeyReq, PubkeyRes, RegionReq, RegionRes, RouterReq, RouterRes,
 };
-use crate::{packet_router, region_watcher, Error, Keypair, PublicKey, Result, Settings};
+use crate::proto::tonic::{self, transport::Server as TransportServer, Request, Response, Status};
 use crate::proto::{
     crypto::Sign,
     services::local::{Api, Server},
     BlockchainTxn, BlockchainTxnAddGatewayV1, Message, Txn,
 };
+use crate::{packet_router, region_watcher, Error, Keypair, PublicKey, Result, Settings};
 use futures::TryFutureExt;
 use std::{net::SocketAddr, sync::Arc};
-use tonic::{self, transport::Server as TransportServer, Request, Response, Status};
 use tracing::info;
 
 pub type ApiResult<T> = std::result::Result<Response<T>, Status>;

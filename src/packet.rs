@@ -1,4 +1,3 @@
-use crate::{DecodeError, Error, PublicKey, Region, Result};
 use crate::proto::{
     beacon,
     services::{
@@ -6,6 +5,7 @@ use crate::proto::{
         router::{PacketRouterPacketDownV1, PacketRouterPacketUpV1},
     },
 };
+use crate::{DecodeError, Error, PublicKey, Region, Result};
 use lorawan::{Direction, PHYPayloadFrame, MHDR};
 use semtech_udp::{
     pull_resp::{self, PhyData, Time},
