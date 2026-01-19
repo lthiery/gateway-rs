@@ -1,0 +1,101 @@
+# MIPS-specific build crate - NOT part of main workspace
+# This crate exists solely to generate a Cargo.lock compatible with Rust 1.72.1
+# The MIPS CI uses this directory for builds with legacy-proto deps only
+
+[package]
+# Use gateway_rs name so imports resolve correctly
+name = "gateway_rs"
+version = "1.3.0"
+edition = "2021"
+
+# Empty workspace table to exclude from parent workspace
+[workspace]
+
+[lib]
+name = "gateway_rs"
+path = "../src/lib.rs"
+
+[[bin]]
+name = "helium_gateway"
+path = "../src/main.rs"
+
+[dependencies]
+# Pin clap to 4.4.x for Rust 1.72.1 compatibility
+clap = { version = "=4.4.6", default-features = false, features = [
+    "derive",
+    "help",
+    "std",
+    "error-context",
+] }
+bs58 = "0"
+semver = "1"
+config = { version = "=0.13.3", default-features = false, features = ["toml"] }
+serde = { version = "1", features = ["rc", "derive"] }
+serde_json = "1"
+serde_urlencoded = "*"
+# Pin to versions compatible with Rust 1.72.1
+http-serde = "1"
+thiserror = "1"
+tokio = { version = "1", default-features = false, features = [
+    "macros",
+    "signal",
+    "rt",
+    "time",
+    "sync",
+    "io-std",
+] }
+tokio-stream = { version = "0", default-features = false }
+futures = "*"
+rust_decimal = { version = "1", features = ["serde-with-float"] }
+triggered = "0.1"
+tracing = "0"
+tracing-subscriber = { version = "0", default-features = false, features = [
+    "smallvec",
+    "fmt",
+    "std",
+] }
+tracing-appender = "0"
+rand = "0.8"
+prost = "0"
+sha2 = "0"
+base64 = ">=0.21"
+angry-purple-tiger = "1"
+lorawan = { package = "lorawan", path = "../lorawan" }
+exponential-backoff = { git = "https://github.com/yoshuawuyts/exponential-backoff", branch = "master" }
+semtech-udp = { version = ">=0.12", default-features = false, features = [
+    "server",
+] }
+# time 0.3.35: has Rust 1.80+ type inference fix, MSRV 1.67.0, uses deranged 0.3.x
+time = { version = "=0.3.35", features = ["std"] }
+# http 0.2 matches http-serde 1.x
+http = "0.2"
+# async-trait for trait impls
+async-trait = "0.1"
+
+# Legacy proto stack - use same aliases as main Cargo.toml for source code compatibility
+# The source code expects these crate names when legacy-proto feature is enabled
+signature = { version = "1", features = ["std"], optional = true }
+tonic-legacy = { package = "tonic", version = "0.10", optional = true }
+helium-proto-legacy = { package = "helium-proto", git = "https://github.com/helium/proto", rev = "c828e0399f88ebbd6d13c8de39c25d70b9440f5b", features = ["services"], optional = true }
+beacon-legacy = { package = "beacon", git = "https://github.com/helium/proto", rev = "c828e0399f88ebbd6d13c8de39c25d70b9440f5b", optional = true }
+# Pin helium-crypto to 0.8.3 which doesn't depend on edition 2024 crates
+helium-crypto-legacy = { package = "helium-crypto", version = "=0.8.3", optional = true }
+
+[features]
+default = ["legacy-proto", "ecc608"]
+legacy-proto = [
+    "signature",
+    "helium-proto-legacy",
+    "beacon-legacy",
+    "helium-crypto-legacy",
+    "tonic-legacy",
+]
+ecc608 = ["helium-crypto-legacy?/ecc608"]
+tpm = ["helium-crypto-legacy?/tpm"]
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = "symbols"

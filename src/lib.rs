@@ -58,7 +58,7 @@ where
 
 macro_rules! impl_sign {
     ($type: ty) => {
-        #[crate::proto::tonic::async_trait]
+        #[async_trait::async_trait]
         impl Sign for $type {
             async fn sign<K>(&mut self, keypair: K) -> Result
             where

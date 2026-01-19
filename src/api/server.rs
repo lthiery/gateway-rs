@@ -8,6 +8,7 @@ use crate::proto::{
     BlockchainTxn, BlockchainTxnAddGatewayV1, Message, Txn,
 };
 use crate::{packet_router, region_watcher, Error, Keypair, PublicKey, Result, Settings};
+use async_trait::async_trait;
 use futures::TryFutureExt;
 use std::{net::SocketAddr, sync::Arc};
 use tracing::info;
@@ -49,7 +50,8 @@ impl LocalServer {
     }
 }
 
-#[tonic::async_trait]
+// Use async_trait crate for compatibility with both old (1.72.1) and new Rust
+#[async_trait]
 impl Api for LocalServer {
     async fn pubkey(&self, _request: Request<PubkeyReq>) -> ApiResult<PubkeyRes> {
         let reply = PubkeyRes {

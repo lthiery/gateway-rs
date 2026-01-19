@@ -3,8 +3,8 @@ use crate::proto::crypto::ecc608;
 #[cfg(feature = "tpm")]
 use crate::proto::crypto::tpm;
 use crate::proto::crypto::{KeyTag, KeyType, Network};
-use crate::proto::tonic::async_trait;
 use crate::{DecodeError, Error, Result};
+use async_trait::async_trait;
 use http::Uri;
 use rand::rngs::OsRng;
 use serde::{de, Deserializer};

@@ -80,6 +80,9 @@ helium-proto = { git = "https://github.com/helium/proto", rev = "3dbaedf3a39ab79
 beacon = { git = "https://github.com/helium/proto", rev = "3dbaedf3a39ab79cabd3b80cf7c648bf23d3c3f8", optional = true }
 helium-crypto = { git = "https://github.com/lthiery/helium-crypto-rs", branch = "main", optional = true }
 
+# async-trait is used for trait impls to support both old (1.72.1) and new Rust
+async-trait = "0.1"
+
 # Legacy proto stack (works with Rust 1.72.1/Cargo 1.72 for mips)
 signature = { version = "1", features = ["std"], optional = true }
 helium-proto-legacy = { package = "helium-proto", git = "https://github.com/helium/proto", rev = "c828e0399f88ebbd6d13c8de39c25d70b9440f5b", features = ["services"], optional = true }
