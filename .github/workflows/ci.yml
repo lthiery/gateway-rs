@@ -60,6 +60,8 @@ jobs:
           - mips-unknown-linux-musl
           - mipsel-unknown-linux-musl
         include:
+          # MIPS targets require Rust 1.72.1 and use mips-build/ directory
+          # with isolated Cargo.lock for compatible dependencies
           - target: mips-unknown-linux-musl
             toolchain: "1.72.1"
           - target: mipsel-unknown-linux-musl

@@ -1,7 +1,7 @@
 use super::{
     AddGatewayReq, AddGatewayRes, PubkeyReq, PubkeyRes, RegionReq, RegionRes, RouterReq, RouterRes,
 };
-use crate::proto::tonic::{self, transport::Server as TransportServer, Request, Response, Status};
+use crate::proto::tonic::{transport::Server as TransportServer, Request, Response, Status};
 use crate::proto::{
     crypto::Sign,
     services::local::{Api, Server},

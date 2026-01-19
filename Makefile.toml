@@ -3,6 +3,8 @@ CROSS_TARGET = "${CARGO_MAKE_PROFILE}"
 FEATURES = "modern-proto,ecc608"
 BUILD_COMMAND = "cross"
 TAR = { source = "${CARGO_MAKE_RUST_TARGET_OS}", default_value = "linux", mapping = { macos = "gtar", linux = "tar" } }
+# Set to "true" for MIPS targets to use mips-build/ directory with isolated Cargo.lock
+MIPS_BUILD = "false"
 
 [env.x86_64-unknown-debian-gnu]
 CROSS_TARGET = "x86_64-unknown-linux-gnu"
@@ -13,16 +15,27 @@ CROSS_TARGET = "x86_64-unknown-linux-gnu"
 CROSS_BUILD_DOCKERFILE = "./.github/cross-docker/Dockerfile-cross-debian-11"
 FEATURES = "tpm"
 
-# MIPS targets use legacy-proto for Rust 1.72.1 compatibility
+# MIPS targets use mips-build/ directory for Rust 1.72.1 compatible Cargo.lock
 [env.mips-unknown-linux-musl]
 FEATURES = "legacy-proto,ecc608"
+MIPS_BUILD = "true"
 
 [env.mipsel-unknown-linux-musl]
 FEATURES = "legacy-proto,ecc608"
+MIPS_BUILD = "true"
 
 [tasks.build]
 description = "Runs the cross/cargo rust compiler."
 condition = { env_set = ["CROSS_TARGET", "BUILD_COMMAND", "FEATURES"] }
+workspace = false
+run_task = [
+    { name = "build-mips", condition = { env = { "MIPS_BUILD" = "true" } } },
+    { name = "build-standard", condition = { env = { "MIPS_BUILD" = "false" } } },
+]
+
+[tasks.build-standard]
+description = "Standard build for non-MIPS targets"
+private = true
 workspace = false
 command = "${BUILD_COMMAND}"
 args = [
@@ -35,6 +48,24 @@ args = [
   "--release"
 ]
 
+[tasks.build-mips]
+description = "Build for MIPS targets using isolated mips-build/ directory"
+private = true
+workspace = false
+cwd = "./mips-build"
+script = '''
+# Build from mips-build/ directory which has Rust 1.72.1 compatible Cargo.lock
+${BUILD_COMMAND} build \
+  --target ${CROSS_TARGET} \
+  --no-default-features \
+  --features ${FEATURES} \
+  --release
+
+# Copy artifacts to main target directory for consistent packaging
+mkdir -p ../target/${CROSS_TARGET}/release
+cp target/${CROSS_TARGET}/release/helium_gateway ../target/${CROSS_TARGET}/release/ 2>/dev/null || true
+'''
+
 [tasks.pkg]
 description = "Package application"
 workspace = false
@@ -44,4 +75,3 @@ script = '''
   cp config/settings.toml target/${CROSS_TARGET}/release
   ${TAR} -zcv -C target/${CROSS_TARGET}/release -f ${PKG_NAME}.tar.gz helium_gateway settings.toml
 '''
-
