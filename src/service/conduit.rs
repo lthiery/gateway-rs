@@ -3,8 +3,8 @@ use crate::{
     service::{CONNECT_TIMEOUT, RPC_TIMEOUT},
     Error, Keypair, PublicKey, Result, Sign,
 };
+use crate::proto::http::Uri;
 use futures::TryFutureExt;
-use http::Uri;
 use std::sync::Arc;
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;

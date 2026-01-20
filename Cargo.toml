@@ -24,7 +24,8 @@ sha2 = "0"
 prost = "0"
 
 [dependencies]
-clap = { version = "4", default-features = false, features = [
+# Pin clap to 4.4.x for Rust 1.72.1 compatibility
+clap = { version = "=4.4.6", default-features = false, features = [
     "derive",
     "help",
     "std",
@@ -32,12 +33,13 @@ clap = { version = "4", default-features = false, features = [
 ] }
 bs58 = "0"
 semver = "1"
-config = { version = "0", default-features = false, features = ["toml"] }
+# Pin config for Rust 1.72.1 compatibility
+config = { version = "=0.13.3", default-features = false, features = ["toml"] }
 serde = { workspace = true }
 serde_json = "1"
 serde_urlencoded = "*"
-http-serde = "2"
-thiserror = "2"
+# thiserror 1.x works on both old and new Rust
+thiserror = "1"
 tokio = { version = "1", default-features = false, features = [
     "macros",
     "signal",
@@ -67,52 +69,56 @@ exponential-backoff = { git = "https://github.com/yoshuawuyts/exponential-backof
 semtech-udp = { version = ">=0.12", default-features = false, features = [
     "server",
 ] }
-time = { version = ">=0.3", features = ["std"] }
-http = "1"
+# Pin time to 0.3.35: has Rust 1.80+ type inference fix, MSRV 1.67.0
+time = { version = "=0.3.35", features = ["std"] }
 
-# Modern proto stack uses tonic 0.14, legacy uses 0.10
-# Each tonic version is optional and tied to its respective proto feature
+# async-trait for trait impls (works on both old and new Rust)
+async-trait = "0.1"
+
+# HTTP dependencies - modern uses http 1.x, legacy uses 0.2.x
+# These are feature-gated because tonic 0.14 requires http 1.x, tonic 0.10 requires http 0.2.x
+http = { version = "1", optional = true }
+http-serde = { version = "2", optional = true }
+http-legacy = { package = "http", version = "0.2", optional = true }
+http-serde-legacy = { package = "http-serde", version = "1", optional = true }
+
+# Modern proto stack (tonic 0.14, requires http 1.x)
 tonic = { version = "0.14", optional = true }
-tonic-legacy = { package = "tonic", version = "0.10", optional = true }
-
-# Modern proto stack (pinned to specific commit for reproducible builds)
 helium-proto = { git = "https://github.com/helium/proto", rev = "3dbaedf3a39ab79cabd3b80cf7c648bf23d3c3f8", features = ["services"], optional = true }
 beacon = { git = "https://github.com/helium/proto", rev = "3dbaedf3a39ab79cabd3b80cf7c648bf23d3c3f8", optional = true }
 helium-crypto = { git = "https://github.com/lthiery/helium-crypto-rs", branch = "main", optional = true }
 
-# async-trait is used for trait impls to support both old (1.72.1) and new Rust
-async-trait = "0.1"
-
-# Legacy proto stack (works with Rust 1.72.1/Cargo 1.72 for mips)
+# Legacy proto stack (tonic 0.10, requires http 0.2.x, works with Rust 1.72.1)
 signature = { version = "1", features = ["std"], optional = true }
+tonic-legacy = { package = "tonic", version = "0.10", optional = true }
 helium-proto-legacy = { package = "helium-proto", git = "https://github.com/helium/proto", rev = "c828e0399f88ebbd6d13c8de39c25d70b9440f5b", features = ["services"], optional = true }
 beacon-legacy = { package = "beacon", git = "https://github.com/helium/proto", rev = "c828e0399f88ebbd6d13c8de39c25d70b9440f5b", optional = true }
-helium-crypto-legacy = { package = "helium-crypto", version = ">=0.8.3", optional = true }
+# Pin helium-crypto to 0.8.3 for Rust 1.72.1 compatibility
+helium-crypto-legacy = { package = "helium-crypto", version = "=0.8.3", optional = true }
 
 [features]
 default = ["modern-proto", "ecc608"]
-modern-proto = ["helium-proto", "beacon", "helium-crypto", "tonic"]
+modern-proto = ["helium-proto", "beacon", "helium-crypto", "tonic", "http", "http-serde"]
 legacy-proto = [
     "signature",
     "helium-proto-legacy",
     "beacon-legacy",
     "helium-crypto-legacy",
     "tonic-legacy",
+    "http-legacy",
+    "http-serde-legacy",
 ]
 ecc608 = ["helium-crypto?/ecc608", "helium-crypto-legacy?/ecc608"]
 tpm = ["helium-crypto?/tpm", "helium-crypto-legacy?/tpm"]
 
 [dev-dependencies]
-time = { version = ">=0.3", features = ["std", "macros"] }
-
+time = { version = "=0.3.35", features = ["std", "macros"] }
 
 [profile.release]
 opt-level = "z"
 lto = true
 codegen-units = 1
 panic = "abort"
-#debug = true
-#strip = "debuginfo"
 strip = "symbols"
 
 [package.metadata.cross.build]

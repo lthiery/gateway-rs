@@ -18,7 +18,7 @@ impl TryFrom<RouterRes> for crate::packet_router::RouterStatus {
     fn try_from(value: RouterRes) -> Result<Self> {
         use std::str::FromStr;
         Ok(Self {
-            uri: http::Uri::from_str(&value.uri)?,
+            uri: crate::proto::http::Uri::from_str(&value.uri)?,
             connected: value.connected,
             session_key: PublicKey::try_from(value.session_key).ok(),
         })

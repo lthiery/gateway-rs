@@ -1,5 +1,5 @@
+use crate::proto::http::Uri;
 use crate::{PublicKey, Result};
-use http::Uri;
 use serde::Deserialize;
 use std::{
     fmt,
@@ -11,7 +11,7 @@ use std::{
 /// A URI that has an associated public key
 #[derive(Clone, Deserialize, Eq)]
 pub struct KeyedUri {
-    #[serde(with = "http_serde::uri")]
+    #[serde(with = "crate::proto::http_serde::uri")]
     pub uri: Uri,
     pub pubkey: Arc<PublicKey>,
 }
@@ -42,7 +42,7 @@ impl TryFrom<crate::proto::services::local::KeyedUri> for KeyedUri {
     type Error = crate::Error;
     fn try_from(v: crate::proto::services::local::KeyedUri) -> Result<Self> {
         let result = Self {
-            uri: http::Uri::from_str(&v.uri)?,
+            uri: crate::proto::http::Uri::from_str(&v.uri)?,
             pubkey: Arc::new(PublicKey::from_bytes(v.address)?),
         };
         Ok(result)
@@ -62,7 +62,7 @@ impl TryFrom<crate::proto::RoutingAddress> for KeyedUri {
     type Error = crate::Error;
     fn try_from(v: crate::proto::RoutingAddress) -> Result<Self> {
         let result = Self {
-            uri: http::Uri::from_str(&String::from_utf8_lossy(&v.uri))?,
+            uri: crate::proto::http::Uri::from_str(&String::from_utf8_lossy(&v.uri))?,
             pubkey: Arc::new(PublicKey::from_bytes(v.pub_key)?),
         };
         Ok(result)

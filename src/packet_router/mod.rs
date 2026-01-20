@@ -27,8 +27,8 @@ pub enum Message {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct RouterStatus {
-    #[serde(with = "http_serde::uri")]
-    pub uri: http::Uri,
+    #[serde(with = "crate::proto::http_serde::uri")]
+    pub uri: crate::proto::http::Uri,
     pub connected: bool,
     pub session_key: Option<PublicKey>,
 }

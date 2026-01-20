@@ -7,7 +7,7 @@ use crate::{
     service::{CONNECT_TIMEOUT, RPC_TIMEOUT},
     Result,
 };
-use http::Uri;
+use crate::proto::http::Uri;
 
 type EntropyClient = services::poc_entropy::Client<Channel>;
 

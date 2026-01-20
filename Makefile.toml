@@ -25,6 +25,7 @@ FEATURES = "legacy-proto,ecc608"
 MIPS_BUILD = "true"
 
 [tasks.build]
+clear = true
 description = "Runs the cross/cargo rust compiler."
 condition = { env_set = ["CROSS_TARGET", "BUILD_COMMAND", "FEATURES"] }
 workspace = false
@@ -49,17 +50,13 @@ args = [
 ]
 
 [tasks.build-mips]
-description = "Build for MIPS targets using isolated mips-build/ directory"
+description = "Build for MIPS targets using mips-build/ wrapper crate"
 private = true
 workspace = false
 cwd = "./mips-build"
 script = '''
-# Build from mips-build/ directory which has Rust 1.72.1 compatible Cargo.lock
-${BUILD_COMMAND} build \
-  --target ${CROSS_TARGET} \
-  --no-default-features \
-  --features ${FEATURES} \
-  --release
+# Build from mips-build/ directory - features are specified in Cargo.toml dependency
+${BUILD_COMMAND} build --target ${CROSS_TARGET} --release
 
 # Copy artifacts to main target directory for consistent packaging
 mkdir -p ../target/${CROSS_TARGET}/release

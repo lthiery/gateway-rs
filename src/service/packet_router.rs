@@ -7,12 +7,12 @@ use crate::proto::{
     transport::Channel,
     Message,
 };
+use crate::proto::http::Uri;
 use crate::{
     impl_sign,
     service::conduit::{ConduitClient, ConduitService},
     DecodeError, Error, Keypair, PublicKey, Result, Sign,
 };
-use http::Uri;
 use std::{
     sync::Arc,
     time::{SystemTime, UNIX_EPOCH},

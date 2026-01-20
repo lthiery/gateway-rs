@@ -18,7 +18,7 @@ pub struct LocalClient {
 
 impl LocalClient {
     pub async fn new(address: &ListenAddress) -> Result<Self> {
-        let uri = http::Uri::try_from(address)?;
+        let uri = crate::proto::http::Uri::try_from(address)?;
         let endpoint = Endpoint::from_shared(uri.to_string()).unwrap();
         let client = Client::connect(endpoint)
             .await

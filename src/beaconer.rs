@@ -11,8 +11,8 @@ use crate::{
     settings::Settings,
     sync, Base64, DecodeError, PacketUp, PublicKey, RegionParams, Result,
 };
+use crate::proto::http::Uri;
 use futures::TryFutureExt;
-use http::Uri;
 use std::sync::Arc;
 use std::time::Instant;
 use time::{Duration, OffsetDateTime};

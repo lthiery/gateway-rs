@@ -1,6 +1,6 @@
+use crate::proto::http::uri::Uri;
 use crate::{api::GatewayStakingMode, KeyedUri, Keypair, PublicKey, Region, Result};
 use config::{Config, Environment, File};
-use http::uri::Uri;
 use serde::Deserialize;
 use std::{fmt, path::Path, str::FromStr, sync::Arc};
 
@@ -83,10 +83,10 @@ pub struct PocSettings {
     #[serde(default)]
     pub disable: bool,
     /// Entropy URL.
-    #[serde(with = "http_serde::uri")]
+    #[serde(with = "crate::proto::http_serde::uri")]
     pub entropy_uri: Uri,
     /// Remote ingestor URL.
-    #[serde(with = "http_serde::uri")]
+    #[serde(with = "crate::proto::http_serde::uri")]
     pub ingest_uri: Uri,
     /// Beacon interval in seconds. Defaults to 6 hours. Note that the rate of
     /// beacons is verified by the oracle so increasing this number will not
@@ -98,7 +98,7 @@ pub struct PocSettings {
 /// Settings for packet routing
 #[derive(Debug, Deserialize, Clone)]
 pub struct RouterSettings {
-    #[serde(with = "http_serde::uri")]
+    #[serde(with = "crate::proto::http_serde::uri")]
     pub uri: Uri,
     // Maximum number of packets to queue up for the packet router
     pub queue: u16,
@@ -216,7 +216,7 @@ impl TryFrom<&ListenAddress> for std::net::SocketAddr {
     }
 }
 
-impl TryFrom<&ListenAddress> for http::Uri {
+impl TryFrom<&ListenAddress> for crate::proto::http::Uri {
     type Error = crate::Error;
     fn try_from(value: &ListenAddress) -> std::result::Result<Self, Self::Error> {
         fn local_uri_from_port(v: &u16) -> String {

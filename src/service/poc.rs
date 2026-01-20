@@ -7,12 +7,12 @@ use crate::proto::{
     transport::Channel,
     Message as ProtoMessage,
 };
+use crate::proto::http::Uri;
 use crate::{
     impl_sign,
     service::conduit::{ConduitClient, ConduitService},
     DecodeError, Keypair, PublicKey, Result, Sign,
 };
-use http::Uri;
 use std::sync::Arc;
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;

@@ -2,6 +2,7 @@
 #![allow(clippy::result_large_err)]
 
 pub mod beaconer;
+pub mod cli;
 pub mod cmd;
 pub mod error;
 pub mod gateway;

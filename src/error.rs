@@ -43,7 +43,7 @@ pub enum EncodeError {
 #[derive(Error, Debug)]
 pub enum DecodeError {
     #[error("uri decode: {0}")]
-    Uri(#[from] http::uri::InvalidUri),
+    Uri(#[from] crate::proto::http::uri::InvalidUri),
     #[error("keypair uri: {0}")]
     KeypairUri(String),
     #[error("json decode: {0}")]
@@ -122,7 +122,7 @@ impl<T> From<tokio::sync::mpsc::error::SendError<T>> for Error {
 from_err!(EncodeError, ProstEncodeError);
 
 // Decode Errors
-from_err!(DecodeError, http::uri::InvalidUri);
+from_err!(DecodeError, crate::proto::http::uri::InvalidUri);
 from_err!(DecodeError, base64::DecodeError);
 from_err!(DecodeError, bs58::decode::Error);
 from_err!(DecodeError, serde_json::Error);

@@ -1,6 +1,19 @@
 //! Unified proto module that abstracts over modern vs legacy proto dependencies.
 //!
 //! Use `crate::proto::*` instead of importing helium_proto, beacon, or helium_crypto directly.
+//! Also provides unified http and http_serde re-exports for version compatibility.
+
+// Re-export http crate (modern uses 1.x, legacy uses 0.2.x)
+#[cfg(not(feature = "legacy-proto"))]
+pub use http;
+#[cfg(feature = "legacy-proto")]
+pub use http_legacy as http;
+
+// Re-export http_serde crate (modern uses 2.x, legacy uses 1.x)
+#[cfg(not(feature = "legacy-proto"))]
+pub use http_serde;
+#[cfg(feature = "legacy-proto")]
+pub use http_serde_legacy as http_serde;
 
 // Re-export the appropriate helium_proto crate
 #[cfg(not(feature = "legacy-proto"))]
